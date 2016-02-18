@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/danrobinson/recursebooks#readme",
   "dependencies": {
+    "pg": "^4.4.6",
     "sequelize": "^3.19.2"
   }
 }
