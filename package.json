@@ -17,7 +17,10 @@
   },
   "homepage": "https://github.com/danrobinson/recursebooks#readme",
   "dependencies": {
+    "express": "^4.13.4",
     "pg": "^4.4.6",
-    "sequelize": "^3.19.2"
+    "sequelize": "^3.19.2",
+    "sequelize-cli": "^2.3.1",
+    "umzug": "^1.9.0"
   }
 }

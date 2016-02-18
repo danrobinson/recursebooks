@@ -19,19 +19,18 @@ var seq = new Sequelize(process.env.RECURSE_DB, process.env.RECURSE_DB_USERNAME,
   }
 });
 
-/*
-seq
-  .authenticate()
-  .then(function(err) {
-    console.log('Connection has been established successfully.');
-  }, function (err) { 
-    console.log('Unable to connect to the database:', err);
-  });
-*/
+// seq
+//   .authenticate()
+//   .then(function(err) {
+//     console.log('Connection has been established successfully.');
+//   }, function (err) { 
+//     console.log('Unable to connect to the database:', err);
+//   });
 
-var Batch = sequelize.define('batch', {
-  "id": {
-
+var Batch = seq.define('batch', {
+  "batchId": {
+    type: Sequelize.INTEGER,
+    primaryKey: true
   },
   "end_date": {
     type: Sequelize.DATE
@@ -39,7 +38,7 @@ var Batch = sequelize.define('batch', {
 
 });
 
-var User = sequelize.define('user', {
+var User = seq.define('user', {
   firstName: {
     type: Sequelize.STRING
   },
@@ -48,13 +47,12 @@ var User = sequelize.define('user', {
   },
   email: {
     type: Sequelize.STRING
-  },
-  batch: {
-
   }
 });
 
-var Author = sequelize.define('author', {
+User.belongsTo(Batch);
+
+var Author = seq.define('author', {
   firstName: {
     type: Sequelize.STRING,
   },
@@ -63,22 +61,28 @@ var Author = sequelize.define('author', {
   }
 });
 
-var Tag = sequelize.define('tag', {
+var Tag = seq.define('tag', {
   name: {
     type: Sequelize.STRING,
   },
 });
 
-var Title = sequelize.define('title', {
+var Category = seq.define('category', {
+  name: {
+    type: Sequelize.STRING,
+  },
+});
+
+var Title = seq.define('title', {
 	name: {
     type: Sequelize.STRING
   },
 });
 
-Title.belongsTo(Tag, {as: 'category'});
+Title.belongsTo(Category);
 Title.belongsToMany(Tag, {as: 'tags', through: 'title_tags'});
 
-var Book = sequelize.define('book', {
+var BookEdition = seq.define('book_edition', {
   isbn: {
     type: Sequelize.STRING
   },
@@ -90,16 +94,45 @@ var Book = sequelize.define('book', {
   }
 });
 
-Book.belongsToMany(Author);
-Book.belongsTo(Title);
+BookEdition.belongsToMany(Author, {through: 'book_authors'});
+BookEdition.belongsTo(Title);
 
-var Copy = sequelize.define('copy', {
+var Copy = seq.define('copy', {
 });
 
-Copy.belongsTo(Book);
+Copy.belongsTo(BookEdition);
 Copy.belongsTo(User, {as: 'donor'});
 
+//loans are temporary and will be deleted after books are returned, while the events hist is maintainted
+//
+var Loan = seq.define('loan', {
+});
 
+Loan.belongsTo(User);
+Loan.belongsTo(Copy);
 
+var Event = seq.define('event', {
+  eventType: {
+    type: Sequelize.ENUM('deleted', 'donated', 'borrowed', 'returned')
+  }
+});
 
+Event.belongsTo(User);
+Event.belongsTo(Copy);
+
+// seq.sync()
+
+module.exports = {
+  Batch: Batch,
+  User: User,
+  Title: Title,
+  Copy: Copy,
+  Tag: Tag,
+  Category: Category,
+  BookEdition: BookEdition,
+  Event: Event,
+  Loan: Loan,
+  seq: seq
+
+};
 
